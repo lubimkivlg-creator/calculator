@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор потерь</title>
+</head>
+<body>
+  <h1>Калькулятор потерь бюджета</h1>
+
+  <p>
+    <label>Бюджет на рекламу в месяц, ₽</label><br>
+    <input type="number" id="budget" value="100000">
+  </p>
+
+  <p>
+    <label>Сфера бизнеса</label><br>
+    <select id="niche">
+      <option value="0.35">Интернет-магазин (товары)</option>
+      <option value="0.3">Услуги для бизнеса (B2B)</option>
+      <option value="0.45">Услуги для людей (B2C)</option>
+      <option value="0.4">Строительство / Ремонт</option>
+      <option value="0.25">Производство / Опт</option>
+      <option value="0.5">Медицина / Клиники</option>
+      <option value="0.4">Образование / Курсы</option>
+      <option value="0.28">IT / SaaS</option>
+      <option value="0.33">Авто / Запчасти</option>
+      <option value="0.38">Недвижимость</option>
+      <option value="0.42">Красота / Здоровье</option>
+      <option value="0.35">Другое</option>
+    </select>
+  </p>
+
+  <p>
+    <label>Заявок с рекламы в месяц (0, если не считаете)</label><br>
+    <input type="number" id="leads" value="20">
+  </p>
+
+  <button onclick="calculate()">Рассчитать</button>
+  <p id="result"></p>
+
+  <script>
+    function calculate() {
+      const budget = Number(document.getElementById("budget").value);
+      const k = Number(document.getElementById("niche").value);
+      const leads = Number(document.getElementById("leads").value);
+
+      const lossMonth = Math.round(budget * k);
+      const lossYear = lossMonth * 12;
+      let text = "Потери в месяц: " + lossMonth + " ₽. За год: " + lossYear + " ₽.";
+
+      if (leads > 0) {
+        const cpa = Math.round(budget / leads);
+        const shouldBe = Math.round(leads * (1 + k));
+        const targetCpa = Math.round(budget / shouldBe);
+        text += " Текущая цена заявки: " + cpa + " ₽. Целевая: " + targetCpa + " ₽. Можно получать на " + (shouldBe - leads) + " заявок больше.";
+      } else {
+        text +=  " Вы не считаете заявки, а значит, не видите, какая реклама работает. Это первая точка потерь: без цифр нельзя оптимизировать бюджет.";;
+      }
+      document.getElementById("result").textContent = text;
+    }
+  </script>
+</body>
+</html>
