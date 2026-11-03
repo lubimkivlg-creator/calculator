@@ -3,61 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Калькулятор потерь</title>
+  <title>Калькулятор потерь бюджета</title>
+  <style>
+    :root {
+      --navy: #0a1a2f;
+      --gold: linear-gradient(0.75turn, rgba(255,148,21,1) 0%, rgba(255,199,9,1) 100%);
+      --gold-text: #ffc709;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px 16px 40px;
+      background: var(--navy);
+      color: #fff;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; }
+    h1 { font-size: 28px; line-height: 1.25; text-align: center; margin: 8px 0; }
+    .sub { text-align: center; opacity: 0.8; margin: 0 0 24px; }
+    .card { background: #fff; color: var(--navy); border-radius: 16px; padding: 24px; }
+    label { display: block; font-weight: 600; margin: 18px 0 6px; }
+    .card label:first-child { margin-top: 0; }
+    input, select {
+      width: 100%; padding: 14px; font-size: 16px; font-family: inherit;
+      color: var(--navy); background: #fff;
+      border: 2px solid #d5dbe5; border-radius: 10px;
+    }
+    input:focus, select:focus { outline: none; border-color: #ff9415; }
+    .btn {
+      display: block; width: 100%; padding: 16px; border: 0; border-radius: 999px;
+      background: var(--gold); color: var(--navy);
+      font-size: 17px; font-weight: 700; font-family: inherit;
+      text-align: center; text-decoration: none; cursor: pointer;
+    }
+    #calc-btn { margin-top: 24px; }
+    .result { display: none; background: var(--navy); color: #fff; border-radius: 12px; padding: 20px; margin-top: 24px; }
+    .result.show { display: block; }
+    .hint { margin: 12px 0 0; opacity: 0.85; font-size: 15px; }
+    .big { margin: 2px 0 0; font-size: 30px; font-weight: 700; color: var(--gold-text); }
+    .result .btn { margin-top: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Калькулятор потерь бюджета</h1>
+  <div class="wrap">
+    <h1>Калькулятор потерь бюджета</h1>
+    <p class="sub">Узнайте за 60 секунд, сколько вы теряете на рекламе</p>
 
-  <p>
-    <label>Бюджет на рекламу в месяц, ₽</label><br>
-    <input type="number" id="budget" value="100000">
-  </p>
+    <div class="card">
+      <label for="budget">Бюджет на рекламу в месяц, ₽</label>
+      <input type="number" id="budget" value="100000">
 
-  <p>
-    <label>Сфера бизнеса</label><br>
-    <select id="niche">
-      <option value="0.35">Интернет-магазин (товары)</option>
-      <option value="0.3">Услуги для бизнеса (B2B)</option>
-      <option value="0.45">Услуги для людей (B2C)</option>
-      <option value="0.4">Строительство / Ремонт</option>
-      <option value="0.25">Производство / Опт</option>
-      <option value="0.5">Медицина / Клиники</option>
-      <option value="0.4">Образование / Курсы</option>
-      <option value="0.28">IT / SaaS</option>
-      <option value="0.33">Авто / Запчасти</option>
-      <option value="0.38">Недвижимость</option>
-      <option value="0.42">Красота / Здоровье</option>
-      <option value="0.35">Другое</option>
-    </select>
-  </p>
+      <label for="niche">Сфера бизнеса</label>
+      <select id="niche">
+        <option value="0.35">Интернет-магазин (товары)</option>
+        <option value="0.3">Услуги для бизнеса (B2B)</option>
+        <option value="0.45">Услуги для людей (B2C)</option>
+        <option value="0.4">Строительство / Ремонт</option>
+        <option value="0.25">Производство / Опт</option>
+        <option value="0.5">Медицина / Клиники</option>
+        <option value="0.4">Образование / Курсы</option>
+        <option value="0.28">IT / SaaS</option>
+        <option value="0.33">Авто / Запчасти</option>
+        <option value="0.38">Недвижимость</option>
+        <option value="0.42">Красота / Здоровье</option>
+        <option value="0.35">Другое</option>
+      </select>
 
-  <p>
-    <label>Заявок с рекламы в месяц (0, если не считаете)</label><br>
-    <input type="number" id="leads" value="20">
-  </p>
+      <label for="leads">Заявок с рекламы в месяц (0, если не считаете)</label>
+      <input type="number" id="leads" value="20">
 
-  <button onclick="calculate()">Рассчитать</button>
-  <p id="result"></p>
+      <button class="btn" id="calc-btn" onclick="calculate()">Рассчитать</button>
+
+      <div class="result" id="result"></div>
+    </div>
+  </div>
 
   <script>
+    function fmt(n) {
+      return n.toLocaleString("ru-RU") + " ₽";
+    }
+
     function calculate() {
       const budget = Number(document.getElementById("budget").value);
       const k = Number(document.getElementById("niche").value);
       const leads = Number(document.getElementById("leads").value);
+      const box = document.getElementById("result");
+
+      if (budget <= 0) {
+        box.innerHTML = "<p>Введите бюджет на рекламу в месяц.</p>";
+        box.classList.add("show");
+        return;
+      }
 
       const lossMonth = Math.round(budget * k);
       const lossYear = lossMonth * 12;
-      let text = "Потери в месяц: " + lossMonth + " ₽. За год: " + lossYear + " ₽.";
+
+      let html = '<p class="hint">Вы теряете в месяц</p><p class="big">' + fmt(lossMonth) + '</p>' +
+                 '<p class="hint">За год</p><p class="big">' + fmt(lossYear) + '</p>';
 
       if (leads > 0) {
         const cpa = Math.round(budget / leads);
         const shouldBe = Math.round(leads * (1 + k));
         const targetCpa = Math.round(budget / shouldBe);
-        text += " Текущая цена заявки: " + cpa + " ₽. Целевая: " + targetCpa + " ₽. Можно получать на " + (shouldBe - leads) + " заявок больше.";
+        const extra = shouldBe - leads;
+        html += '<p class="hint">Сейчас заявка обходится в ' + fmt(cpa) +
+                (extra > 0 ? ', а могла бы в ' + fmt(targetCpa) + ': это на ' + extra + ' заявок больше при том же бюджете.' : '.') +
+                '</p>';
       } else {
-        text +=  " Вы не считаете заявки, а значит, не видите, какая реклама работает. Это первая точка потерь: без цифр нельзя оптимизировать бюджет.";;
+        html += '<p class="hint">Вы не считаете заявки, а значит, не видите, какая реклама работает. Это первая точка потерь: без цифр нельзя оптимизировать бюджет.</p>';
       }
-      document.getElementById("result").textContent = text;
+
+      html += '<a class="btn" href="https://elenaananina.ru/" target="_blank">Хочу разбор моей рекламы</a>';
+      box.innerHTML = html;
+      box.classList.add("show");
     }
   </script>
 </body>
